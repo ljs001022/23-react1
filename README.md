@@ -2,6 +2,83 @@
 
 대림대학교 컴퓨터정보학부 3학년 1반 리엑트 수업
 
+## GitHub 2023년 3월 23일
+## JSX(Java Script XML)란?
+
+### JSX 소개
+
+- JavaScript를 확장한 문법
+- 리액트로 프로젝트를 개발할 때 사용되므로 공식적인 자바스크립트 문법은 아님
+
+### JSX 역할
+
+- 브라우저에서 실행하기 전에 바벨을 사용하여 일반 자바스크립트 형태의 코드로 변환됨
+
+### JSX의 장점
+
+- JSX는 하나의 파일에 자바스크립트와 HTML을 동시에 작성하여 편리함
+- 자바스크립트에서 HTML을 작성하듯이 하기 때문에 가독성이 높고 작성하기 쉬움
+- Injection Attack이라 불리는 해킹 방법을 방어함으로써 보안에 강함
+
+### Jsx 사용법
+
+- 모든 자바스크립트문법을 지원
+- 자바스크립트 문법에 xml과 html을 섞어서 사용
+- 아래 코드의 2번 라인처럼 섞어서 사용하는 것
+- 만일 html 이나 xml에 자바스크립트 코드를 사용하고 싶으면{}괄호 사용
+
+### JSX에 표현식 포함하기
+
+- JSX 안에 자바스크립트 표현식 을 중괄호로 묶어서 포함시킬 수 있음
+
+```js
+function formatName(user) {
+  return user.firstName + " " + user.lastName;
+}
+
+const user = {
+  firstName: "Harper",
+  lastName: "Perez",
+};
+
+const element = <h1>Hello, {formatName(user)}!</h1>;
+
+ReactDOM.render(element, document.getElementById("root"));
+```
+
+### JSX 속성 정의
+
+- 속성에 따옴표를 이용해 문자열 리터럴을 정의할 수 있음
+
+```js
+const element = <div tabIndex="0"></div>;
+```
+
+- 속성에 중괄호를 이용해 자바스크립트 표현식을 포함시킬 수 있음
+
+```js
+const element = <img src={user.avatarUrl}></img>;
+```
+
+### JSX 자식 정의
+
+- 만약 태그가 비어있다면, XML 처럼 `/>`를 이용해 닫아주어야 함
+
+```js
+const element = <img src={user.avatarUrl} />;
+```
+
+- JSX 태그는 자식을 가질 수 있음
+
+```js
+const element = (
+  <div>
+    <h1>Hello!</h1>
+    <h2>Good to see you here.</h2>
+  </div>
+);
+```
+
 ---
 
 ## GitHub 2023년 3월 16일

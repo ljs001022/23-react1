@@ -6,7 +6,7 @@ const styles = {
     padding: 8,
     display: "flex",
     flexDirection: "row",
-    vorder: "1px solid grey",
+    border: "1px solid grey",
     borderRadius: 16
   },
   messageText: {

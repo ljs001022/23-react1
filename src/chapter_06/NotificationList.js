@@ -37,9 +37,9 @@ class NotificationList extends React.Component {
           notifications: notifications
         });
       }else {
-        this.setState({
-          notifications: []
-        });
+        // this.setState({ // 주석을 풀면 문구들이 화면에서 사라짐
+        //   notifications: []
+        // });
         clearInterval(timer);
       }
     }, 1000);

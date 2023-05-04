@@ -1,7 +1,438 @@
 # 23-React1 201930226 이종섭
 
 대림대학교 컴퓨터정보학부 3학년 1반 리엑트 수업
+## GitHub 2023년 4월 27일
 
+## 8장 이벤트 핸들링
+
+### 이벤트 처리하기
+
+- DOM에서 클릭 이벤트를 처리하는 예제 코드
+
+```js
+<button onclick = "activate()">
+  Activate
+</button>
+```
+
+- React에서 클릭 이벤트 처리하는 예제 코드
+  
+```js
+<button onClick = {activate}>
+  Activate
+</button>
+```
+
+#### 둘의 차이점
+1. 이벤트 이름이 onclick에서 onClick으로 변경(Camel case)
+2. 전달하려는 함수는 문자열에서 함수 그대로 전달
+
+- 이벤트가 발생했을 때 해당 이벤트를 처리하는 함수를 "이벤트 핸들러(Event Handler)"라고함
+- 또는 이벤트가 발생하는 것을 계속 듣고 있다는 의미로 "이벤트 리스너(Event Listener)"라고도 함
+
+### 이벤트 핸들러 추가하는 방법은?
+
+- 버튼을 클릭하면 이벤트 핸들러 함수인 handleClick()함수를 호출 하도록 되오 있음
+- bind를 사용하지 않으면 this.handleClick은 글로벌 스코프에서 호출되어, undefined로 사용할 수 없기 때문
+- bind를 사용하지 않으려면 화살표 함수를 사용하는 방법도 있음
+- 하지만 클래스 컴포넌트는 이제 거의 사용하지 않기 때문에 이 내용은 참고만 하기
+  
+  ```js
+  class Toggle extends React.Componet{
+    constructor(props){
+      super(props);
+
+      this.state = {isToggleOn: true};
+
+      // callback에서 `this`를 사용하기 위해서는 바인딩을 필수적으로 해야함
+      this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleClick(){
+      this.setState(prevState => ({
+        isToggleOn: !prevState.isToggleOn
+      }));
+    }
+
+    render() {
+      return(
+        <button onClick={this.handleClick}>
+          {this.state.isToggleOn ? '켜짐' : '꺼짐'}
+        </button>
+      );
+    }
+  }
+  ```
+- 클래스형을 함수형으로 바꾸면 다음 코드와 같음
+
+```js
+function Toggle(props){
+  const [isToggleOn, setIsToggleOn] = useState(true);
+
+  // 방법 1. 함수 안에 함수로 정의
+  function handleClick(){
+    setIsToggleOn((isToggleOn) => !isToggleOn);
+  }
+
+  // 방법 2. arrow function을  사용하여 정의
+  const handleClick = () => {
+    setIsToggleOn((isToggleOn) => !isToggleOn);
+  }
+
+  return(
+    <button onClick = {handleClick}>
+      {isToggleOn ? "켜짐" : "꺼짐"}
+    </button>
+  )
+}
+```
+
+- 함수형에서 이벤트 핸들러를 정의하는 방법은 두 가지 임
+- 함수형에서는 this를 사용하지않고 onClick에서 바로 HandleClick을 넘기면 됨
+
+### Arguments 전달하기
+
+- 함수를 정의할 떄는 파라미터(Parameter) 혹은 매개변수, 함수를 사용할 때는 아규먼트(Argument) 혹은 인자라고 부름
+- 이벤트 핸들러에 매개변수를 전달해야 하는 경우도 많음
+
+```js
+<button onClick = {(event) => this.deleteItem(id, event)}>삭제하기</button>
+<button onClick = {this.deleteItem.bind(this, id)}>삭제하기</button>
+```
+
+- 위의 코드는 모두 동일한 역할을 하지만 하나는 화살표 함수, 다른 하나는 bind를 사용함
+- evnet라는 매개변수는 리액트의 이벤트 객체를 의미함
+- 두 방법 모두 첫 번째 매개변수는 id이고 두 번째 매개변수로 event가 전달 됨
+- 첫 번째 코드는 명시적으로 event를 매개변수로 넣어 주었고, 두 번째 코드는 id이후 두 번째 매개변수로 event가 자동 전달 됨(이 방법은 클래스형에서 사용하는 방법)
+
+### (실습) 클릭 이벤트 처리하기
+
+1. ConfirmButton 컴포넌트 만들기
+2. 클래스 필드 문법 사용하기
+3. 함수 컴포넌트로 변경하기
+
+#### 클래스 필드
+```js
+import React from"react";
+
+class ConfirmButton extends React.Component{
+  constructor(props){
+    super(props);
+
+    this.state = {
+      isConfirmed: false,
+    };
+    
+    this.handleConfirm = this.handleConfirm.bind(this);
+  }
+
+  handleConfirm(){
+    this.setState((prevState) => ({
+      insConfirmed: !preState.isConfirmed,
+    }));
+  }
+
+  render(){
+    return(
+      <button
+        onClick={this.handleConfirm}
+        disabled={this.state.isConfirmed}
+      >
+        {this.state.isConfirmed ? "확인 됨" : "확인하기"}
+      </button>
+    )
+  }
+}
+```
+#### 함수형 컴포넌트
+```js
+import React,{useState} from "react";
+
+function ConfirmedButton(props){
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const handleConfirm = () => {
+    setIsConfirmed((prevIsConfirmed) => !prevIsConfirmed);
+  };
+
+  return(
+    <button
+      onClick = {handleConfirm}
+      disabled = {isConfirmed}
+    >
+      {isConfirmed ? "확인 됨" : "확인하기"}
+    </button>
+  )
+}
+```
+
+### 8장 요약
+
+#### 이벤트란
+
+- 사용자가 버튼을 클릭하는 등의 사건을 의미
+
+#### 이벤트 처리하기
+
+- DOM의 이벤트
+  - 이벤트의 이름을 모두 소문자로
+  - 이벤트를 처리할 함수를 문자열로 전달
+- 리액트의 이벤트
+  - 이벤트의 이름을 카멜 표기법으로 표기
+  - 이벤트를 처리할 함수를 그대로 전달
+
+- 이벤트 핸들러
+  - 이벤트가 발생했을 때 해당 이벤트를 처리하는 함수
+  - 이벤트 리스너 라고도 함
+  - 클래스 컴포넌트
+    - 클래스의 함수로 정의하고 생성자에서 바인딩해서 사용
+    - 클래스 필드 문법도 사용가능
+  - 함수 컴포넌트
+    - 함수 안에 함수로 정의하거나 arrow function을 사용해서 정의
+
+- Arguments 전달하기
+  - Arguments란?
+    - 함수에 전달할 데이터
+    - 파라미터 또는 매개변수라고 부르기로 함
+  - 클래스 컴포넌트
+    - arrow function을 사용하거나 Function.prototype.bind를 사용해서 전달
+  - 함수 컴포넌트
+    - 이벤트 핸들러 호출 시 원하는 순서대로 매개변수를 넣어서 사용
+
+---
+
+## 9장 조건부 렌더링
+
+### 조건부 렌더링이란?
+
+- 여기서 조건이란 우리가 알고있는 조건문의 조건임
+  
+```js
+function Greeting(props){
+  const isLoggedIn = props.isLoggedIn;
+  if(isLoggedIn){
+    return <UserGreeting />
+  }
+  return <GuestGreeting>
+}
+```
+
+- props로 전달 받은 isLoggedIn이 true이면 <UserGreeting />을, false이면 <GuestGreeting />을 retrun함
+- 이와 같은 렌더링을 조건부 렌더링이라고 함
+
+### 엘리먼트 변수
+
+- 렌더링해야 될 컴포넌트를 변수처럼 사용하는 방법이 엘리먼트 변수임
+- state에 따라 button 변수에 컴포넌트의 객체를 저장하여 return문에 사용하고 있음
+
+```js
+let button;
+if(isLoggendIn){
+  button = <LogutButton onClick = {handleLogutClick} />;
+}else{
+  button = <LogutButton onClick = {handleLoginClock} />;
+}
+
+return(
+  <div>
+    <Greeting isLoggedIn = {isLoggedIn} />
+    {button}
+  </div>
+)
+```
+
+### 인라인 조건
+
+- 필요한 곳에 조건문을 직접 넣어 사용하는 방법
+
+- 인라인 if
+  - if문을 직접 사용하지 않고, 동일한 효과를 내기 위해 &&논리 연산자를 사용
+  - && 또는 and연산자로 모든 조건이 참일때만 참이 됨
+  - 첫 번째 조건이 거짓이면 두 번쨰 조건은 판단할 필요가 없음
+```js
+//true && expression -> expression
+// false && expression -> false
+
+{unreadMessages.length > 0 &&
+  <h2>
+    현재 {unreadMessages.length}개의 읽지 않은 메시지가 있습니다.
+  </h2>
+}
+```
+| A | B | Result |
+| - | - | - |
+| T | T | T |
+| T | F | F |
+| F | T | F |
+| F | F | F |
+
+- 인라인 if...else
+  - 삼항 연산자를 사용
+  - 문자열이나 엘리먼트를 넣어서 사용할 수 있음
+
+```js
+function UserStatus(props){
+  return(
+    <div>
+      이 사용자는 현재<b>{props.isLoggedIn ? '로그인' : '로그인하지 않음'}</b> 상태입니다.
+    </div>
+    <div>
+      <Greeting isLoggedIn = {isLoggedIn} />
+      {isLoggedIn
+        ? <LogoutButton onClick = {handleLogoutClick}>
+        : <LoginButton onClick = {handleLoginClick}>
+      }
+    </div>
+  )
+}
+```
+
+### 컴포넌트 렌더링 막기
+
+- 컴포넌트 렌더링을 하고싶지 않을 때에는 null을 리턴 함
+
+```js
+function WarningBanner(propr){
+  if(!props.warning){
+    return null;
+  }
+
+  return(
+    <div>
+      경고!
+    </div>
+  )
+}
+```
+
+### (실습) 로그인 여부를 나타내는 툴바 만들기
+
+
+#### index.js
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+// import App from './App';
+import reportWebVitals from './reportWebVitals';
+import Accommodate from './chapter_07/Accommodate'; -> import LandingPage from './chapter_09/LandingPage';
+
+
+
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <Accommodate /> -> <LandingPage />
+  </React.StrictMode>
+);
+
+reportWebVitals();
+
+```
+
+#### LandingPage.jsx
+```js
+import React from 'react';
+import { useState } from 'react';
+import Toolbar from './Toolbar';
+
+function LandingPage(props){
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const onClickLogin = () => {
+    setIsLoggedIn(true);
+  }
+
+  const onClickLogout = () =>{
+    setIsLoggedIn(false);
+  }
+
+  return (
+    <div>
+      <Toolbar
+        isLoggedIn = {isLoggedIn}
+        onClickLogin = {onClickLogin}
+        onClickLogout = {onClickLogout}
+      />
+      <div style={{padding : 16}}>소플과 함께하는 리액트 공부!</div>
+    </div>
+  );
+};
+
+export default LandingPage;
+```
+
+#### Toolbar.jsx
+```js
+import React from 'react';
+
+const styles = {
+  wrapper : {
+    padding : 16,
+    display : "flex",
+    flexDirection: "row",
+    borderBottom: "1px solid grey",
+  },
+  greeting: {
+    marginRight: 8,
+  },
+}
+
+const Toolbar = (props) => {
+  const {isLoggedIn, onClickLogin, onClickLogout} = props;
+
+  return (
+    <div style={styles.wrapper}>
+      {isLoggedIn && <span style={styles.greeting}>환영합니다!</span>}
+      {isLoggedIn ? (
+        <button onClick={onClickLogout}>로그아웃</button>
+      ) : (
+        <button onClick={onClickLogin}>로그인</button>
+      )}
+    </div>
+  );
+};
+
+export default Toolbar;
+```
+
+### 9장 요약
+
+- 조건부 렌더링
+  - 조건에 따라 렌더링 결과가 달리지도록 하는 것
+
+- 엘리먼트 변수
+  - 리액트 엘리먼트를 변수처럼 저장해서 사용하는 방법
+
+- 인라인 조건
+  - 조건문을 코드 안에 집어넣는 것
+  - 인라인 if
+    - if문을 필요한 곳에 직접 집어넣어서 사용하는 방법
+    - 논리 연산자 &&를 사용(AND 연산)
+    - 앞에 나오는 조건문이 true일 경우에만 뒤에 나오는 엘리먼트를 렌더링
+  - 인라인 if...else
+    - if...else문을 필요한 곳에 직접 집어 넣어서 사용하는 방법
+    - 삼항 연산자 ?를 사용
+    - 앞에 나오는 조건문이 true면 첫 번째 항목을 리턴, false면 두 번째 항목을 리턴
+    - 조건에 따라 각기 다른 엘리먼트를 렌더링하고 싶을 때 사용
+
+- 컴포넌트 렌더링 막기 
+  - 리액트에서 null을 리턴하면 렌더링되지 않음
+  - 특정 컴포넌트를 렌더링하고 싶지 않을 경우 null을 리턴하면 됨
+---
+## 10장 리스트와 키란 무엇인가
+
+### 리스트
+
+- 리스트는 우리말로 목록이라 뜻을 가짐
+- 컴퓨터 프로그래밍에서는 같은 아이템을 순서대로 모아놓은 것이 해당 됨
+- 리스트를 위해 사용하는 자료구조를 배열(Array)임
+- 배열은 자바스크립트의 변수나 객체를 하나의 변수를 묶어놓은 것
+
+### 키
+
+- 프로그래밍에서 key는 각 객체나 아이템을 구분할 수 있는 고유값을 의미
 ## GitHub 2023년 4월 13일
 ### 6장 요약
 

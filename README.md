@@ -2,6 +2,134 @@
 
 대림대학교 컴퓨터정보학부 3학년 1반 리엑트 수업
 
+## GitHub 2023년 5월 11일
+
+## 12장
+
+### 실습 섭씨온도와 화씨온도 표시하기
+
+1. Chapter_12폴더 생성
+2. 생성된 폴더에 TemperatureInput.jsx와 Calculator.jsx폴더 생성
+3. TemperatureInput.jsx에는 사용자가 입력할 입력 폼을 만듬
+
+##### TemperatureInput.jsx
+```js
+const scaleName = {
+  c: "섭씨",
+  f: "화씨",
+};
+
+function TemperatureInput(props){
+  const handleChange = (e) => {
+    props.onTemperatureChange(e.target.value);
+  };
+
+  return(
+    <fieldset>
+      <legend>
+        온도를 입력해주세요 (단위: {scaleName[props.scale]});
+      </legend>
+      <input value={props.temperature} onChange={handleChange}/>
+    </fieldset>
+  )
+}
+
+export default TemperatureInput;
+```
+
+4. Calculator.jsx에는 사용자가 입력한 숫자를 변형해줄 함수들과 출력 폼 만듬
+
+##### Calculator.jsx
+```js
+import React, { useState } from 'react';
+import TemperatureInput from "./TemperatureInput";
+
+function BoilingVerdict(props) {
+  if (props.celsius >= 100) {
+      return <p>물이 끓습니다.</p>;
+  }
+  return <p>물이 끓지 않습니다.</p>;
+}
+
+function toCelsius(fahrenheit) {
+  return ((fahrenheit - 32) * 5) / 9;
+}
+
+function toFahrenheit(celsius) {
+  return (celsius * 9) / 5 + 32;
+}
+
+function tryConvert(temperature, convert) {
+  const input = parseFloat(temperature);
+  if (Number.isNaN(input)) {
+      return "";
+  }
+  const output = convert(input);
+  const rounded = Math.round(output * 1000) / 1000;
+  return rounded.toString();
+}
+
+function Calculator(props) {
+  const [temperature, setTemperature] = useState("");
+  const [scale, setScale] = useState("c");
+
+  const handleCelsiusChange = (temperature) => {
+      setTemperature(temperature);
+      setScale("c");
+  };
+
+  const handleFahrenheitChange = (temperature) => {
+      setTemperature(temperature);
+      setScale("f");
+  };
+
+  const celsius =
+      scale === "f" ? tryConvert(temperature, toCelsius) : temperature;
+  const fahrenheit =
+      scale === "c" ? tryConvert(temperature, toFahrenheit) : temperature;
+
+  return (
+      <div>
+          <TemperatureInput
+              scale="c"
+              temperature={celsius}
+              onTemperatureChange={handleCelsiusChange}
+          />
+          <TemperatureInput
+              scale="f"
+              temperature={fahrenheit}
+              onTemperatureChange={handleFahrenheitChange}
+          />
+          <BoilingVerdict celsius={parseFloat(celsius)} />
+      </div>
+  );
+}
+
+export default Calculator;
+```
+
+5. index.js 변경
+
+##### index.js
+```js
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import Calculator from './chapter_12/Calculator';
+import './index.css';
+import reportWebVitals from './reportWebVitals';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <Calculator />
+  </React.StrictMode>
+);
+
+reportWebVitals();
+
+```
+
+---
 ## GitHub 2023년 5월 4일
 
 ## 10장 리스트와 키

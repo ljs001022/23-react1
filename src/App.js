@@ -1,10 +1,10 @@
-import './App.css';
+import "./App.css";
+import ProfileCard from "./chapter_13/ProfileCard";
 
-function App() {  
+function App() {
   return (
     <div className="App">
-      <h1>안녕, 리액트!</h1>
-      <h2>현재 시간: {new Date().toLocaleTimeString()}</h2>
+      <ProfileCard />
     </div>
   );
 }

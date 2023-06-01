@@ -2,6 +2,247 @@
 
 대림대학교 컴퓨터정보학부 3학년 1반 리엑트 수업
 
+## GitHub 2023년 5월 25일
+
+### 여러 개의 컨텍스트 사용하기
+
+- 여러 개의 컨텍스트를 동시에 사용하려면 Context.Provider를 중첩해서 사용함
+- ThemeContext와 UserContext를 중첩해서 사용하고 있음
+- 이런 방법으로 여러 개의 컨텍스트를 동시에 사용할 수 있음
+
+```js
+// 테마를 위한 컨텍스트
+const ThemContext = React.createContext(`light`);
+
+// 로그인 한 사용자를 위한 컨텍스트
+const UserContext = React.createContext({
+  name: "Guest",
+});
+
+class App extends React.Component {
+  render() {
+    const { sugnedInUser, theme } = this.props;
+
+    return (
+      <ThemeContext.Provider value={theme}>
+        <UserContext.Provider value={signedInUser}>
+          <Layout />
+        </UserContext.Provider>
+      </ThemeContext.Provider>
+    );
+  }
+}
+
+// 컨텍스트 컴포넌트는 두 개의 컨텍스트로부터 값을 가져와서 렌더링 함
+function Content() {
+  render(
+    <ThemContext.Consumer>
+      {(theme) => (
+        <UserContext.Consumer>
+          {(user) => <ProfilePage user={user} theme={theme} />}
+        </UserContext.Consumer>
+      )}
+    </ThemContext.Consumer>
+  );
+}
+```
+
+- 하지만 두 개 또는 그 이상의 컨텍스트 값이 자주 함께 사용될 경우 모든 값을 한 번에 제공해 주는 별도의 render porp 포넌트를 직접 만드는 것을 고려하는 것이 좋음
+
+### useContext
+
+- 함수형 컴포넌트에서 컨텍스트를 사용하기 위해 컴포넌트를 매번 Consumer 컴포넌트로 감싸주는 것보다 Hook을 사용하는 것이 더 좋음
+- useContext() 훅은 React.createContext()함수 호출로 생성된 컨텍스트 객체를 인자로 받아서 현재 컨텍스트의 값을 리턴함
+
+```js
+function MyComponent(props){
+  const value = useContext(MyContext);
+
+  return(
+    ...
+  )
+}
+```
+
+- 이 방법도 가장 가까운 상위 Provider로 부터 컨텍스트의 값을 받아옴
+- 만일 값이 변경되면 useContext()훅을 사용하는 컴포넌트가 재 렌더링 됨
+- 또한 useContext()훅을 사용할 때에는 파라미터로 컨텍스트 객체를 넣어줘야 한다는 것을 기억해야 함
+
+```js
+// 올바른 사용법
+useContext(MyContext);
+
+// 잘못된 사용법
+useContext(MyContext.Consumer);
+useContext(MyContext.Provider);
+```
+
+### 실습 컨텍스트를 사용하여 테마 변경 기능 만들기
+
+1. chapter_14폴더 생성
+2. ThemeContext.jsx컴포넌트 제작
+3. MainContent.jsx컴포넌트 제작
+4. DarkOrLight.jsx컴포넌트 제작
+5. index.js파일 수정
+6. App을 실행하고 정상 동작 여부 확인
+
+## 15장
+
+### CSS
+
+#### CSS란?
+
+- CSS(Cascading Style Sheets)란 웹 개발을 할 때 스타일링을 하기 위해 가장 대표적으로 사용되는 것
+- Cascading이라는 단어는 계단식이라는 뜻으로 CSS에 여러 가지 스타일이 정의되 있는데 한 번에 여러 스타일이 적용될 경우에 스타일 충돌을 막기 위해 계단식으로 스타일이 적용되는 규칙을 가짐
+- 엘리먼트에 스타일이 적용되는 규칙을 selector이라고 부름
+- 단어 그대로 해석하면 선택자라고 하는데 스타일을 어떤 엘리먼트에 적용할지를 선택하게 해주는 것임
+
+#### CSS문법과 선택자
+
+- CSS는 크게 선택자와 스타일로 구성되어 있음
+- 선택자를 먼저 쓰고 이후에 적용할 스타일을 중괄호안에 세미콜론으로 구분하여 하나씩 기술함
+
+#### id선택자
+
+- 엘리먼트의 id속성으로 엘리먼트를 선택
+- #뒤에 아이디를 넣어 사용
+
+```js
+#id{
+  color: black;
+  text-align: center;
+}
+```
+
+#### 클래스 선택자
+
+- 엘리먼트의 클래스 속성으로 엘리먼트를 선택
+- .뒤에 클래스명을 넣어서 사용
+
+```js
+.className{
+  color: black;
+  text-align: center;
+}
+```
+
+#### 전체 선택자
+
+- 전체 엘리먼트에 적용하기 위한 선택자
+- 그룹 선택자를 그룹으로 묶어서 하나의 스타일을 적용하기 위해 사용하는 선택자
+
+```js
+*{
+  color: black;
+  text-align: center;
+}
+```
+
+#### 그룹 선택자
+
+-grouping은 그룹으로 묶는다는 뜻으로 그룹 선택자는 말 그대로 여러 가지 선택자를 그룹으로 묶어 하나의 스타일을 적용하기 위해 사용하는 선택자임
+
+```js
+h1{
+  color: black;
+  text-align: center;
+}
+
+h2{
+  color: black;
+  text-align: center;
+}
+```
+
+- 그래서 그룹 선택자를 사용하여 아래와 같이 바꿔주면 굉장히 간결해지고 유지 보수도 쉬워짐
+
+```js
+h1, h2, p{
+  color: black;
+  text-align: center;
+}
+```
+
+#### 엘리먼트의 상태와 관련된 선택자
+
+- 여기서 상태라는 것은 마우스 커서가 엘리먼트 위에 올라오거나 엘리먼트가 활성화되어 있는 경우 등을 의미함
+- 대표적인 선택자로는 :hover, :active, :focus, :checked, :first-chil, :last-child등이 있음
+
+#### 레이아웃과 관련된 속성
+
+- 화면에 엘리먼트들을 어떻게 배치할 것인지를 의미함
+- 레이아웃과 관련해서 가장 중요한 속성은 display임
+- display 속성은 엘리먼트를 어떻게 표시할지에 관한 속성임
+- 모든 엘리먼트는 그 종류에 따라서 기본적으로 정해진 display 속성값을 가지고 있음
+- 대부분 엘리먼트는 블록(block)또는 인라인(inline)값을 가짐
+
+#### position
+
+- position속성은 엘리먼트를 어떻게 위치시킬 것인지를 정의하기 위해 사용
+
+#### 엘리먼트의 가로와 세로길이
+
+- 엘리먼트의 가로, 세로 길이와 관련된 속성은 width, height, min-width, min-height, max-width, max-height가 있으며 값으로 보통 실제 픽셀 값을 넣거나 상대값인 퍼센트를 사용함
+- 또한 px단위가 아닌 em, rem등의 단위도 사용
+
+### 플렉스 박스
+
+- 플렉스박스는 기존 CSS의 레이아웃 사용의 불편함을 개선하기 위해 등장함
+- 플렉스박스가 나오기 전에는 위의 배운 것처럼 display의 속성을 활용해서 레이아웃을 구성했음
+- 이런 속성들은 레이아웃을 구성하는데 불편한 부분이 있었고 이러한 문제를 해결하기 위해서 플렉스박스가 나옴
+- 플렉스박스는 크게 container와 item으로 구성됨
+- display: flex;를 사용하면 엘리먼트가 플렉스 컨테이너가 됨
+- 플렉스 컨테이너는 내부에 여러 개의 엘리먼트를 포함할 수 있음
+- 플렉스 컨테이너에 포함되는 엘리먼트를 플렉스박스의 아이템이 됨
+
+#### font-family
+
+- font-family는 어떤 글꼴을 사용할 것인지를 결정하는 속성임
+- font-family 속성의 값으로는 사용할 글꼴의 이름을 적어주면 됨
+- 여기서 주의할 점은 글꼴의 이름에 띄어쓰기가 들어갈 경우 큰따옴표로 묶어주어야함
+
+```js
+#title1{
+  font-family: "Times New Roman", Times, serif;
+}
+#title2{
+  font-family: Arial, Verdana, sans-serif;
+}
+#title3{
+  font-family: "Courier New", Monaco, monospace;
+}
+```
+
+- 그런데 사용할 글꼴의 이름이 하나가 아니라 콤마로 구분하여 여러 개의 글꼴이 쓰여있음
+- 이것은 font-family의 속성의 fallback 시스템 때문
+- 대비책이라는 뜻으로 지정한 글꼴을 찾지 못했을 경우 대비해서 사용할 글꼴을 순서대로 지정해주는것
+- fallback 시스템의 가장 마지막에 쓰여진 것은 일반적인 글꼴 분류인데 모든 글꼴은 아래에 나와있는 일반적인 글꼴 분류 중 하 가지에 속함
+
+```HTML
+<strong>일반적인 글꼴 분류</strong>
+<p>serif : 각 글자의 모서리에 작은 테두리를 갖고 있는 형태의 글꼴</p>
+<p>sans-serif : 모서리에 테두리가 없이 깔끔한 선을 가진 글꼴이며 컴퓨터 모니터에서 serif보다 가독성이 좋음</p>
+<p>monospace : 모든 글자가 같은 가로 길이를 가지는 글꼴. 코딩할 때 주로 사용</p>
+<p>cursive : 사람이 손글씨 모양의 글꼴</p>
+<p>fantasy : 장식이 들어간 형태의 글꼴</p>
+```
+
+### 많이 사용하는 기타 속성
+
+- 지금까지 다양한 CSS속성들에 대해서 배웠지만 위에 나오지 않은 자주 사용되는 CSS속성이 많음
+
+```HTML
+<strong>CSS의 색상 값</strong>
+<p>16진수 컬러 값</p>
+<p>투명도를 가진 16진수 컬러 값</p>
+<p>RGB 컬러 값</p>
+<p>RGBA 컬러 값</p>
+<p>HSL 컬러 값</p>
+<p>HSLA 컬러 값</p>
+<p>미리 정의돈 색상의 이름</p>
+<p>currentcolor 키워드: 현재 지정된 색상 값을 사용</p>
+```
+
 ## 13장
 
 ### 합성에 대해 알아보기

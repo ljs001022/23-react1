@@ -1,10 +1,10 @@
 import "./App.css";
-import ProfileCard from "./chapter_13/ProfileCard";
+import DarkOrLight from "./chapter_14/DarkOrLight";
 
 function App() {
   return (
     <div className="App">
-      <ProfileCard />
+      <DarkOrLight />
     </div>
   );
 }
